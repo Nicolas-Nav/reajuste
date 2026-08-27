@@ -12,3 +12,8 @@ venv/
 .claude/
 node_modules/
 .next/
+
+# Archivos de instrucciones para asistentes de codigo
+CLAUDE.md
+AGENTS.md
+.cursorrules

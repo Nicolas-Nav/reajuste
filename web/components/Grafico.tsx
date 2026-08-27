@@ -1,0 +1,102 @@
+'use client'
+
+import { useId } from 'react'
+import { mesCorto, entero } from '@/lib/formato'
+
+export type PuntoGrafico = { fecha: string; valor: number }
+
+/**
+ * Grafico de area de la serie, en SVG puro.
+ *
+ * Sin libreria de graficos a proposito: son cuatro operaciones de escala y una
+ * ruta, y una dependencia de 50 kB para esto no se justifica.
+ */
+export function Grafico({
+  puntos,
+  etiqueta,
+}: {
+  puntos: PuntoGrafico[]
+  etiqueta: string
+}) {
+  const id = useId()
+
+  if (puntos.length < 2) return null
+
+  const ANCHO = 720
+  const ALTO = 220
+  const MARGEN = { arriba: 16, abajo: 28, izq: 8, der: 8 }
+
+  const valores = puntos.map((p) => p.valor)
+  const min = Math.min(...valores)
+  const max = Math.max(...valores)
+  const rango = max - min || 1
+
+  const anchoUtil = ANCHO - MARGEN.izq - MARGEN.der
+  const altoUtil = ALTO - MARGEN.arriba - MARGEN.abajo
+
+  const x = (i: number) => MARGEN.izq + (i / (puntos.length - 1)) * anchoUtil
+  const y = (v: number) => MARGEN.arriba + altoUtil - ((v - min) / rango) * altoUtil
+
+  const linea = puntos.map((p, i) => `${i === 0 ? 'M' : 'L'} ${x(i)} ${y(p.valor)}`).join(' ')
+  const area = `${linea} L ${x(puntos.length - 1)} ${MARGEN.arriba + altoUtil} L ${x(0)} ${MARGEN.arriba + altoUtil} Z`
+
+  const primero = puntos[0]
+  const ultimo = puntos[puntos.length - 1]
+
+  return (
+    <figure className="mt-10">
+      <figcaption className="mb-3 flex items-baseline justify-between text-sm">
+        <span className="font-medium text-tinta">{etiqueta}</span>
+        <span className="text-tenue">
+          {entero(primero.valor)} a {entero(ultimo.valor)}
+        </span>
+      </figcaption>
+
+      <div className="overflow-x-auto">
+        <svg
+          viewBox={`0 0 ${ANCHO} ${ALTO}`}
+          className="h-auto w-full min-w-[320px]"
+          role="img"
+          aria-label={`${etiqueta}, de ${entero(primero.valor)} en ${mesCorto(primero.fecha.slice(0, 7))} a ${entero(ultimo.valor)} en ${mesCorto(ultimo.fecha.slice(0, 7))}`}
+        >
+          <defs>
+            <linearGradient id={`relleno-${id}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="var(--color-marca)" stopOpacity="0.18" />
+              <stop offset="100%" stopColor="var(--color-marca)" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+
+          <path d={area} fill={`url(#relleno-${id})`} />
+
+          <path
+            d={linea}
+            fill="none"
+            stroke="var(--color-marca)"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{
+              strokeDasharray: 2000,
+              strokeDashoffset: 2000,
+              animation: 'trazo 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            }}
+          />
+
+          <circle cx={x(puntos.length - 1)} cy={y(ultimo.valor)} r="4" fill="var(--color-marca)" />
+
+          <text x={x(0)} y={ALTO - 8} className="fill-tenue text-[11px]" textAnchor="start">
+            {mesCorto(primero.fecha.slice(0, 7))}
+          </text>
+          <text
+            x={x(puntos.length - 1)}
+            y={ALTO - 8}
+            className="fill-tenue text-[11px]"
+            textAnchor="end"
+          >
+            {mesCorto(ultimo.fecha.slice(0, 7))}
+          </text>
+        </svg>
+      </div>
+    </figure>
+  )
+}

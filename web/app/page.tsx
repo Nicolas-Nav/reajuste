@@ -1,69 +1,73 @@
-import Image from "next/image";
+import { Calculadora } from '@/components/Calculadora'
 
-export default function Home() {
+export default function Inicio() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <main className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+      {/*
+        El contenedor es ancho para aprovechar la pantalla, pero los parrafos se
+        limitan aparte: una linea de texto de 1.100 px es incomoda de leer.
+      */}
+      <header>
+        <p className="font-mono text-xs tracking-[0.2em] text-marca uppercase">Reajuste</p>
+
+        <h1 className="mt-4 max-w-4xl text-[clamp(2.25rem,6vw,4rem)] leading-[1.03] font-semibold tracking-tight text-balance">
+          Cuanto vale hoy la plata de antes
+        </h1>
+
+        <p className="mt-5 max-w-xl text-lg leading-relaxed text-tenue text-pretty">
+          Escribe un monto y el mes en que lo tenias. Te digo cuanto necesitarias hoy
+          para comprar lo mismo, con datos del Banco Central desde 2010.
+        </p>
+      </header>
+
+      <Calculadora />
+
+      <section className="mt-20 border-t border-linea pt-10">
+        <h2 className="text-sm font-semibold text-tinta">Como se calcula</h2>
+
+        <div className="mt-4 grid gap-6 text-sm leading-relaxed text-tenue md:grid-cols-3">
+          <p>
+            El calculo principal usa la <strong className="text-tinta">UF</strong>, que el
+            Banco Central reajusta a diario segun la inflacion del mes anterior. Por eso
+            los arriendos y los creditos en Chile estan en UF: ya es un indice de precios
+            encadenado.
+          </p>
+          <p>
+            Como contraste se calcula lo mismo con el{' '}
+            <strong className="text-tinta">IPC encadenado</strong>, que es una fuente
+            independiente. Los dos metodos coinciden con menos de 0,1% de diferencia, y
+            esa coincidencia es la verificacion de que el numero esta bien.
+          </p>
+          <p>
+            Un detalle que suele salir mal: el IPC se publica como variacion mensual, no
+            como indice. Para comparar dos fechas hay que encadenar esas variaciones
+            multiplicando, no sumando. Doce meses de 1% dan 12,68% acumulado, no 12%.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
+      </section>
+
+      <footer className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-linea pt-8 text-sm text-tenue">
+        <p>
+          Datos de{' '}
           <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            href="https://mindicador.cl"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noreferrer noopener"
+            className="underline underline-offset-4 transition-colors hover:text-tinta"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
+            mindicador.cl
           </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+          , actualizados a diario.
+        </p>
+        <a
+          href="https://github.com/Nicolas-Nav/reajuste"
+          target="_blank"
+          rel="noreferrer noopener"
+          className="underline underline-offset-4 transition-colors hover:text-tinta"
+        >
+          Codigo en GitHub
+        </a>
+      </footer>
+    </main>
+  )
 }

@@ -140,15 +140,28 @@ Pendiente tuyo para el deploy: en Vercel hay que configurar **Root Directory =
 
 ---
 
-## Fase 5. Interfaz `[N]` (2 a 3 dias)
+## Fase 5. Interfaz `[C]` TERMINADA
 
-* [ ] Calculadora: monto, fecha origen, fecha destino
-* [ ] Resultado destacado, con la perdida de poder adquisitivo en porcentaje
-* [ ] Comparacion en las cuatro varas de medida
-* [ ] Grafico de la serie entre ambas fechas
-* [ ] Estados de carga y de error
-* [ ] Responsive
-* [ ] Un ejemplo precargado, para que se entienda sin escribir nada
+* [x] Calculadora: monto, fecha origen, fecha destino
+* [x] Resultado destacado, con la perdida de poder adquisitivo en porcentaje
+* [x] Comparacion en pesos, UF, UTM y dolares en ambas fechas
+* [x] Grafico de la UF en el periodo, en SVG propio sin libreria
+* [x] Estados de carga y de error, en español y con `role="alert"`
+* [x] Responsive, verificado a 1600 px y a 375 px sin scroll horizontal
+* [x] Ejemplo precargado que se calcula solo al entrar
+* [x] Formato chileno: punto para miles, coma para decimales
+
+Dos cosas que aparecieron al probar en el navegador y no se veian en el codigo:
+
+**El formulario no se enviaba.** El input del monto tenia `min="1"` con
+`step="1000"`, combinacion que solo acepta 1, 1001, 2001... El navegador
+bloqueaba el envio en silencio con cualquier monto redondo. Se corrigio a
+`step="1"` y ademas se puso `noValidate` en el formulario, para que la
+validacion sea siempre la nuestra, en español y visible en la pagina.
+
+**Las columnas del formulario se aplastaban.** Los input de tipo `month` traen
+un ancho minimo intrinseco grande y las columnas `fr` no los dejan encoger.
+Se resolvio con `minmax(0, ...)`.
 
 ---
 
