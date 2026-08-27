@@ -15,5 +15,11 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]
 
+# Hay que declarar el paquete a mano: la carpeta `web` del frontend tambien
+# parece un paquete de nivel superior, y setuptools se niega a adivinar cual de
+# los dos empaquetar.
+[tool.setuptools]
+packages = ["pipeline"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
