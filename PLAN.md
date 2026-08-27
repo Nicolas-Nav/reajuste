@@ -18,12 +18,8 @@ Convenciones de este documento:
 * [x] `[C]` Crear estructura de carpetas y repo local
 * [x] `[C]` Verificar que mindicador.cl responde y con que forma vienen los datos
 * [x] `[C]` Definir el nombre del proyecto: Reajuste
-* [ ] `[N]` Crear el proyecto en Neon y copiar el connection string (10 min)
-  * Project name: `reajuste`
-  * Region: AWS US East 1 (N. Virginia) si esta disponible; Vercel corre sus
-    funciones ahi por defecto y quien habla con la base es la API, no el visitante
-  * Services: solo Postgres. Object storage, Functions, AI gateway y Neon Auth apagados
-* [ ] `[N]` Crear el repo en GitHub y hacer el primer push (5 min)
+* [x] `[N]` Crear el proyecto en Neon y copiar el connection string
+* [x] `[C]` Crear el repo en GitHub: https://github.com/Nicolas-Nav/reajuste
 
 ---
 
@@ -83,21 +79,38 @@ trabajo los datos de alguien que solo los grafico.
 
 ---
 
-## Fase 2. Base de datos `[N]`
+## Fase 2. Base de datos `[C]` TERMINADA
 
-* [ ] Poner el connection string de Neon en `.env` (15 min)
-* [ ] Correr la carga inicial: `python -m pipeline ingesta --desde 2010` (10 min)
-* [ ] Verificar la idempotencia: correr la ingesta dos veces y confirmar con
-      `python -m pipeline resumen` que no se duplico nada (5 min)
+* [x] Connection string de Neon en `.env`, que esta en `.gitignore`
+* [x] `db.py` normaliza la URL: Neon entrega `postgresql://`, que SQLAlchemy
+      interpreta como psycopg2, y usamos psycopg 3
+* [x] Carga inicial: 33.497 registros, 12 indicadores desde 2010
+* [x] Idempotencia verificada: segunda ingesta completa, conteos identicos
+
+Pendiente tuyo: **rotar la contraseña de Neon**, porque quedo escrita en el chat.
+Boton "Reset password" en el dialogo de conexion. Despues hay que actualizarla en
+dos lugares: el `.env` local y el secret del repo, con
+`gh secret set DATABASE_URL --repo Nicolas-Nav/reajuste`.
 
 ---
 
-## Fase 3. Automatizacion `[N]` (1 a 2 horas)
+## Fase 3. Automatizacion `[C]` TERMINADA
 
-* [ ] Workflow que corre los tests en cada push
-* [ ] Workflow de ingesta diaria con `schedule`, gratis en repos publicos
-* [ ] Guardar el connection string como secret del repo
-* [ ] Confirmar al dia siguiente que el cron corrio solo
+* [x] Workflow de tests en cada push, verde
+* [x] Workflow de ingesta diaria con `schedule` a las 13:00 UTC
+* [x] Connection string guardado como secret del repo
+* [x] Ingesta disparada a mano y verificada de punta a punta: escribio 1.246
+      registros del año en curso y los totales quedaron identicos, o sea la
+      idempotencia tambien funciona desde CI
+* [ ] `[N]` Confirmar mañana que el cron corrio solo, sin dispararlo
+
+El cron trae solo el año en curso, unas 12 peticiones en vez de 200. La carga
+historica fue una vez y el upsert se encarga del resto.
+
+Dos cosas que conviene saber de los cron en Actions: las corridas programadas se
+pueden atrasar bastante en horarios de alta demanda, y GitHub **desactiva el
+schedule si el repo pasa 60 dias sin actividad**. Si el proyecto queda quieto y
+un dia los datos dejan de actualizarse, es por eso.
 
 ---
 
