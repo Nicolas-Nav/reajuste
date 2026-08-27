@@ -1,5 +1,5 @@
 [project]
-name = "plata-real"
+name = "reajuste"
 version = "0.1.0"
 description = "Pipeline de indicadores economicos chilenos y calculadora de poder adquisitivo"
 requires-python = ">=3.10"

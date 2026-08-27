@@ -1,4 +1,4 @@
-"""JSON crudo de la fuente → tabla ordenada.
+"""Convierte el JSON crudo de la fuente en una tabla ordenada.
 
 El punto delicado acá son las fechas. La fuente entrega instantes UTC que
 corresponden a la medianoche de Chile:

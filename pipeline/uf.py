@@ -2,7 +2,7 @@
 
 Por qué existe este módulo además de `ipc.py`:
 
-La fuente **no publica IPC del año en curso** — al momento de escribir esto la
+La fuente **no publica IPC del año en curso**. Al momento de escribir esto la
 serie de IPC llega hasta diciembre del año anterior, mientras que la UF tiene
 datos hasta más de un mes hacia adelante. Una calculadora que responde "cuánto
 vale hoy" no puede quedarse ocho meses atrasada.

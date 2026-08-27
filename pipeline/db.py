@@ -39,6 +39,20 @@ class SinConexion(RuntimeError):
     """No hay connection string configurado."""
 
 
+def normalizar_url(url: str) -> str:
+    """Adapta el connection string al driver que usamos.
+
+    Neon (y casi todos los paneles) entregan la URL como `postgresql://...`,
+    que SQLAlchemy interpreta como psycopg2. Nosotros usamos psycopg 3, asi que
+    hay que pedirlo explicitamente. Pegar la URL tal cual la copiaste del panel
+    tiene que funcionar.
+    """
+    for prefijo in ("postgresql://", "postgres://"):
+        if url.startswith(prefijo):
+            return "postgresql+psycopg://" + url[len(prefijo):]
+    return url
+
+
 def motor(url: str | None = None) -> Engine:
     """Crea el engine. Lee DATABASE_URL del entorno si no se pasa una URL."""
     url = url or os.environ.get("DATABASE_URL")
@@ -47,7 +61,7 @@ def motor(url: str | None = None) -> Engine:
             "falta DATABASE_URL. Copia .env.example a .env y pon el "
             "connection string de Neon."
         )
-    return create_engine(url, pool_pre_ping=True)
+    return create_engine(normalizar_url(url), pool_pre_ping=True)
 
 
 def crear_esquema(engine: Engine) -> None:

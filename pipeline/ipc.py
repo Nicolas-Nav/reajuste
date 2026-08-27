@@ -50,7 +50,7 @@ def verificar_continuidad(marco: pd.DataFrame) -> None:
 
 
 def construir_indice(marco: pd.DataFrame) -> pd.DataFrame:
-    """Variaciones mensuales → índice encadenado.
+    """Convierte variaciones mensuales en un indice encadenado.
 
     Espera un DataFrame con columnas `fecha` y `valor`, donde `valor` es la
     variación porcentual del mes. Devuelve columnas `periodo` e `indice`.

@@ -92,7 +92,7 @@ def comando_calcular(args: argparse.Namespace) -> int:
         )
         indice = ipc.construir_indice(marco_ipc)
         por_ipc = ipc.convertir(indice, args.monto, args.desde, hasta)
-        print(f"  (vía IPC encadenado: ${por_ipc:,.0f} — "
+        print(f"  (vía IPC encadenado: ${por_ipc:,.0f}, "
               f"{abs(por_ipc - valor) / valor * 100:.2f}% de diferencia)\n")
     except (ipc.SerieIncompleta, fuente.ErrorFuente) as error:
         print(f"  (sin contraste con IPC: {error})\n")

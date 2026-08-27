@@ -6,3 +6,7 @@ venv/
 .pytest_cache/
 *.egg-info/
 .DS_Store
+
+# Tooling de agentes (instalado localmente, no es parte del proyecto)
+.agents/
+.claude/
