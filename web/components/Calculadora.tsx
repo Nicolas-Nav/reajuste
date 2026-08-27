@@ -124,9 +124,10 @@ export function Calculadora() {
               className="w-full rounded-lg border border-linea bg-white py-3 pr-4 pl-8 text-lg tabular-nums transition-colors focus:border-marca focus:ring-2 focus:ring-marca/20 focus:outline-none"
             />
           </div>
-          {monto && Number(monto) > 0 && (
-            <p className="mt-1.5 text-xs text-tenue">{entero(Number(monto))} pesos</p>
-          )}
+          {/* Altura fija para que la fila no salte al aparecer o desaparecer. */}
+          <p className="mt-1.5 h-4 text-xs text-tenue">
+            {monto && Number(monto) > 0 ? `${entero(Number(monto))} pesos` : ''}
+          </p>
         </Campo>
 
         <SelectorMes
@@ -145,11 +146,25 @@ export function Calculadora() {
           max={mesActual()}
         />
 
-        <div className="flex items-end">
+        {/*
+          El espaciador invisible ocupa lo mismo que las etiquetas de los otros
+          campos, para que el boton quede a la altura de los input. Sin el, el
+          boton se alinea al fondo de la fila, que crece con el texto de ayuda
+          que aparece bajo el monto.
+        */}
+        <div>
+          {/* Solo desde sm: en movil los campos van apilados y el espaciador
+              seria un hueco vacio. */}
+          <span aria-hidden className="mb-2 hidden text-sm font-medium select-none sm:block">
+            &nbsp;
+          </span>
           <button
             type="submit"
             disabled={cargando}
-            className="w-full rounded-lg bg-tinta px-6 py-3 font-medium text-papel transition-opacity hover:opacity-90 disabled:opacity-50 sm:w-auto"
+            // Misma altura que los campos: text-lg iguala el tamaño de texto y
+            // el borde transparente compensa el 1 px que ellos tienen a cada
+            // lado.
+            className="w-full rounded-lg border border-transparent bg-tinta px-6 py-3 text-lg font-medium text-papel transition-opacity hover:opacity-90 disabled:opacity-50 sm:w-auto"
           >
             {cargando ? 'Calculando' : 'Calcular'}
           </button>
