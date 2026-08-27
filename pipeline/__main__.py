@@ -100,30 +100,53 @@ def comando_calcular(args: argparse.Namespace) -> int:
     return 0
 
 
-def main(argv: list[str] | None = None) -> int:
-    load_dotenv()
+def construir_parser() -> argparse.ArgumentParser:
+    """Arma el parser completo.
 
-    parser = argparse.ArgumentParser(prog="pipeline", description=__doc__)
-    parser.add_argument("-v", "--verboso", action="store_true")
+    `-v` se define en un parser padre que heredan tanto el principal como cada
+    subcomando, para que funcione en las dos posiciones: `pipeline -v ingesta`
+    y `pipeline ingesta -v`. El `SUPPRESS` es necesario porque, si no, el valor
+    por defecto del subcomando pisaria el que se paso antes del subcomando.
+    """
+    comun = argparse.ArgumentParser(add_help=False)
+    comun.add_argument(
+        "-v", "--verboso", action="store_true", default=argparse.SUPPRESS
+    )
+
+    parser = argparse.ArgumentParser(
+        prog="pipeline", description=__doc__, parents=[comun]
+    )
     sub = parser.add_subparsers(dest="comando", required=True)
 
-    p_ingesta = sub.add_parser("ingesta", help="descarga y guarda en la base")
+    p_ingesta = sub.add_parser(
+        "ingesta", parents=[comun], help="descarga y guarda en la base"
+    )
     p_ingesta.add_argument("--desde", type=int, default=2010, help="año inicial")
     p_ingesta.add_argument("--hasta", type=int, default=None, help="año final")
     p_ingesta.add_argument("--indicadores", nargs="*", choices=fuente.INDICADORES)
     p_ingesta.set_defaults(func=comando_ingesta)
 
-    p_resumen = sub.add_parser("resumen", help="qué hay guardado en la base")
+    p_resumen = sub.add_parser(
+        "resumen", parents=[comun], help="qué hay guardado en la base"
+    )
     p_resumen.set_defaults(func=comando_resumen)
 
-    p_calc = sub.add_parser("calcular", help="poder adquisitivo, sin usar la base")
+    p_calc = sub.add_parser(
+        "calcular", parents=[comun], help="poder adquisitivo, sin usar la base"
+    )
     p_calc.add_argument("--monto", type=float, required=True)
     p_calc.add_argument("--desde", type=_mes, required=True, help="AAAA-MM")
     p_calc.add_argument("--hasta", type=_mes, default=None, help="AAAA-MM")
     p_calc.set_defaults(func=comando_calcular)
 
-    args = parser.parse_args(argv)
-    _configurar_log(args.verboso)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    load_dotenv()
+
+    args = construir_parser().parse_args(argv)
+    _configurar_log(getattr(args, "verboso", False))
 
     try:
         return args.func(args)
