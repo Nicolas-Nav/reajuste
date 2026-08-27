@@ -49,8 +49,31 @@ def comando_ingesta(args: argparse.Namespace) -> int:
         total += escritos
         print(f"  {indicador:18s} {escritos:6d} registros")
 
+    if "ipc" in elegidos:
+        total += _guardar_indice_ipc(engine)
+
     print(f"\n{total} registros escritos (insertados o actualizados).")
     return 0
+
+
+def _guardar_indice_ipc(engine) -> int:
+    """Recalcula el indice encadenado del IPC y lo persiste.
+
+    Se hace sobre la serie completa que hay en la base, no sobre lo recien
+    descargado: el encadenamiento necesita todos los meses desde el inicio, y la
+    ingesta diaria solo trae el año en curso.
+    """
+    completo = db.leer(engine, "ipc")
+
+    try:
+        indice = ipc.construir_indice(completo)
+    except ipc.SerieIncompleta as error:
+        print(f"  {ipc.INDICADOR_DERIVADO:18s} omitido: {error}")
+        return 0
+
+    escritos = db.guardar(engine, ipc.como_serie(indice))
+    print(f"  {ipc.INDICADOR_DERIVADO:18s} {escritos:6d} registros (derivado)")
+    return escritos
 
 
 def comando_resumen(args: argparse.Namespace) -> int:

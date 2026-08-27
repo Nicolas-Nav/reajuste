@@ -123,3 +123,22 @@ class TestPoderAdquisitivo:
         desde, hasta = date(2024, 1, 1), date(2024, 2, 1)
         assert ipc.variacion_acumulada(indice, desde, hasta) == pytest.approx(25.0)
         assert ipc.perdida_poder_adquisitivo(indice, desde, hasta) == pytest.approx(20.0)
+
+
+class TestSeriePersistible:
+    def test_formato_de_tabla(self):
+        indice = ipc.construir_indice(serie(0.0, 1.0, 1.0))
+        salida = ipc.como_serie(indice)
+        assert list(salida.columns) == ["indicador", "fecha", "valor"]
+        assert set(salida["indicador"]) == {"ipc_indice"}
+
+    def test_la_fecha_es_el_primer_dia_del_mes(self):
+        indice = ipc.construir_indice(serie(0.0, 1.0))
+        salida = ipc.como_serie(indice)
+        assert list(salida["fecha"]) == [date(2024, 1, 1), date(2024, 2, 1)]
+
+    def test_conserva_los_valores_del_indice(self):
+        indice = ipc.construir_indice(serie(0.0, 1.0, 1.0))
+        salida = ipc.como_serie(indice)
+        assert salida["valor"].iloc[0] == pytest.approx(100.0)
+        assert salida["valor"].iloc[-1] == pytest.approx(102.01)

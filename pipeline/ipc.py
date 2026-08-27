@@ -73,6 +73,27 @@ def construir_indice(marco: pd.DataFrame) -> pd.DataFrame:
     return ordenado[["periodo", "indice"]]
 
 
+INDICADOR_DERIVADO = "ipc_indice"
+
+
+def como_serie(indice: pd.DataFrame) -> pd.DataFrame:
+    """Deja el indice en el formato de la tabla `indicadores`, para guardarlo.
+
+    El encadenamiento se calcula una sola vez, aca en Python, y se persiste como
+    la serie `ipc_indice`. Asi la API lo lee ya listo en vez de re-implementar la
+    misma logica en TypeScript, que es la clase de duplicacion que termina
+    divergiendo sin que nadie se entere.
+
+    La fecha de cada punto es el primer dia de su mes.
+    """
+    salida = indice.copy()
+    salida["fecha"] = salida["periodo"].dt.to_timestamp().dt.date
+    salida["valor"] = salida["indice"]
+    salida["indicador"] = INDICADOR_DERIVADO
+
+    return salida[["indicador", "fecha", "valor"]].reset_index(drop=True)
+
+
 def _indice_en(indice: pd.DataFrame, momento: date) -> float:
     periodo = pd.Period(momento, freq="M")
     fila = indice.loc[indice["periodo"] == periodo, "indice"]

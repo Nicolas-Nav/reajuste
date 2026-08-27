@@ -10,3 +10,5 @@ venv/
 # Tooling de agentes (instalado localmente, no es parte del proyecto)
 .agents/
 .claude/
+node_modules/
+.next/
