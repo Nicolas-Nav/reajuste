@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from 'react'
 
 import { Resultado } from './Resultado'
+import { SelectorMes } from './SelectorMes'
 import type { PuntoGrafico } from './Grafico'
 import { entero, mesActual } from '@/lib/formato'
 import type { RespuestaConversion, RespuestaError, RespuestaSerie } from '@/lib/tipos'
@@ -128,29 +129,21 @@ export function Calculadora() {
           )}
         </Campo>
 
-        <Campo etiqueta="Desde" htmlFor="desde">
-          <input
-            id="desde"
-            type="month"
-            min={LIMITE_INFERIOR}
-            max={hasta}
-            value={desde}
-            onChange={(e) => setDesde(e.target.value)}
-            className="w-full rounded-lg border border-linea bg-white px-4 py-3 text-lg transition-colors focus:border-marca focus:ring-2 focus:ring-marca/20 focus:outline-none"
-          />
-        </Campo>
+        <SelectorMes
+          etiqueta="Desde"
+          valor={desde}
+          onChange={setDesde}
+          min={LIMITE_INFERIOR}
+          max={hasta}
+        />
 
-        <Campo etiqueta="Hasta" htmlFor="hasta">
-          <input
-            id="hasta"
-            type="month"
-            min={desde}
-            max={mesActual()}
-            value={hasta}
-            onChange={(e) => setHasta(e.target.value)}
-            className="w-full rounded-lg border border-linea bg-white px-4 py-3 text-lg transition-colors focus:border-marca focus:ring-2 focus:ring-marca/20 focus:outline-none"
-          />
-        </Campo>
+        <SelectorMes
+          etiqueta="Hasta"
+          valor={hasta}
+          onChange={setHasta}
+          min={desde}
+          max={mesActual()}
+        />
 
         <div className="flex items-end">
           <button

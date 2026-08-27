@@ -143,6 +143,7 @@ Pendiente tuyo para el deploy: en Vercel hay que configurar **Root Directory =
 ## Fase 5. Interfaz `[C]` TERMINADA
 
 * [x] Calculadora: monto, fecha origen, fecha destino
+* [x] Selector de mes propio, en vez del `input type="month"` nativo
 * [x] Resultado destacado, con la perdida de poder adquisitivo en porcentaje
 * [x] Comparacion en pesos, UF, UTM y dolares en ambas fechas
 * [x] Grafico de la UF en el periodo, en SVG propio sin libreria
