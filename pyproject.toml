@@ -1,0 +1,19 @@
+[project]
+name = "plata-real"
+version = "0.1.0"
+description = "Pipeline de indicadores economicos chilenos y calculadora de poder adquisitivo"
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.31",
+    "pandas>=2.0",
+    "SQLAlchemy>=2.0",
+    "psycopg[binary]>=3.1",
+    "python-dotenv>=1.0",
+    "tzdata>=2024.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
