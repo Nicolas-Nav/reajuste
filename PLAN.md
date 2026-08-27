@@ -114,15 +114,29 @@ un dia los datos dejan de actualizarse, es por eso.
 
 ---
 
-## Fase 4. API en Next.js `[N]` (1 a 2 dias)
+## Fase 4. API en Next.js `[C]` TERMINADA
 
-* [ ] Proyecto Next.js con TypeScript y Tailwind
-* [ ] `GET /api/series/[indicador]`, serie historica con rango de fechas
-* [ ] `GET /api/convertir`, el calculo: monto, fecha origen, fecha destino
-* [ ] Devolver el resultado en pesos, UF, UTM y dolares. Esa comparacion es la
-      parte interesante del producto
-* [ ] Tests de los endpoints
-* [ ] Manejo de errores: fechas fuera de rango, montos invalidos
+* [x] Proyecto Next.js 16 con TypeScript y Tailwind, en `web/`
+* [x] `GET /api/series/[indicador]`, serie historica con rango de fechas
+* [x] `GET /api/convertir`, el calculo completo
+* [x] Resultado en pesos, UF, UTM y dolares en ambas fechas
+* [x] Contraste automatico entre el deflactor UF y el IPC encadenado
+* [x] 22 tests del calculo, sin red ni base de datos
+* [x] Manejo de errores con codigos correctos: 400 parametros invalidos,
+      404 indicador inexistente, 422 fecha fuera de rango, 503 sin configurar
+* [x] Los tests del web se suman al CI, junto con el build
+
+El encadenamiento del IPC **no se reimplemento en TypeScript**. El pipeline lo
+calcula en Python y lo guarda como la serie `ipc_indice`; la API la lee ya lista.
+Duplicar esa logica en dos lenguajes es la forma mas segura de que un dia dejen
+de coincidir sin que nadie se entere.
+
+Verificacion cruzada: la API responde $1.331.548 para $800.000 de 2015-01, el
+mismo numero exacto que la CLI en Python. Y con destino dentro de la serie de
+IPC, los dos deflactores difieren en 0,097%.
+
+Pendiente tuyo para el deploy: en Vercel hay que configurar **Root Directory =
+`web`** y agregar `DATABASE_URL` como variable de entorno.
 
 ---
 

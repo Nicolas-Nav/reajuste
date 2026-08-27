@@ -7,7 +7,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  pytest:
+  pipeline:
+    name: Pipeline (Python)
     runs-on: ubuntu-latest
 
     steps:
@@ -25,3 +26,29 @@ jobs:
       # segundos y no dependen de que mindicador.cl este arriba.
       - name: Correr tests
         run: pytest -q
+
+  web:
+    name: Web (TypeScript)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Correr tests
+        run: npm test
+
+      - name: Verificar tipos y compilar
+        # Sin DATABASE_URL a proposito: el build no debe necesitar la base.
+        run: npm run build
