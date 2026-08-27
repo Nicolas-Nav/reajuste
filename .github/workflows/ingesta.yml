@@ -1,0 +1,38 @@
+name: Ingesta diaria
+
+# La carga historica completa (desde 2010) se corre a mano una sola vez.
+# Este workflow solo trae el año en curso: son ~12 peticiones en vez de ~200,
+# y como la escritura es idempotente, volver a bajar meses ya guardados
+# simplemente los actualiza sin duplicar nada.
+
+on:
+  schedule:
+    # 13:00 UTC, que en Chile son las 09:00 o 10:00 segun el horario de verano.
+    # Para entonces los indicadores del dia ya estan publicados.
+    - cron: "0 13 * * *"
+  workflow_dispatch:
+
+jobs:
+  ingesta:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -e .
+
+      - name: Cargar el año en curso
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m pipeline ingesta --desde "$(date -u +%Y)" --verboso
+
+      - name: Estado de la base
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m pipeline resumen
