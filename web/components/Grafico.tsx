@@ -45,12 +45,13 @@ export function Grafico({
 
   return (
     <figure className="mt-10">
-      <figcaption className="mb-3 flex items-baseline justify-between text-sm">
-        <span className="font-medium text-tinta">{etiqueta}</span>
-        <span className="text-tenue">
-          {entero(primero.valor)} a {entero(ultimo.valor)}
-        </span>
-      </figcaption>
+      {/*
+        Sin repetir cifras a proposito. El grafico dibuja la serie diaria y la
+        tabla usa valores de fin de mes, asi que los extremos no coinciden al
+        peso; mostrarlos en los dos lados se lee como una contradiccion. Aca va
+        la forma, en la tabla van los numeros.
+      */}
+      <figcaption className="mb-3 text-sm font-medium text-tinta">{etiqueta}</figcaption>
 
       <div className="overflow-x-auto">
         <svg

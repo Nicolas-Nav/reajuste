@@ -17,7 +17,13 @@ export type RespuestaConversion = {
     deflactor: string
   }
   contraste: Contraste
+  /** Cuantas unidades de cada vara compra el monto. */
   varas: { desde: MontoEnVaras; hasta: MontoEnVaras }
+  /** Cuanto cuesta una unidad de cada vara, en pesos. */
+  unidades: {
+    desde: Partial<Record<Vara, number | null>>
+    hasta: Partial<Record<Vara, number | null>>
+  }
 }
 
 export type RespuestaSerie = {

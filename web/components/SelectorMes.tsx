@@ -32,13 +32,19 @@ export function SelectorMes({ etiqueta, valor, onChange, min, max }: Props) {
 
   const [abierto, setAbierto] = useState(false)
   const [anioVisible, setAnioVisible] = useState(() => Number(valor.slice(0, 4)))
+  // Dos vistas: la grilla de meses y la de años. Sin la de años, saltar de 2015
+  // a 2026 son once clics en la flecha.
+  const [vista, setVista] = useState<'meses' | 'anios'>('meses')
 
   const anioMin = Number(min.slice(0, 4))
   const anioMax = Number(max.slice(0, 4))
 
   // Al reabrir, mostrar el año del valor elegido y no donde quedo la navegacion.
   useEffect(() => {
-    if (abierto) setAnioVisible(Number(valor.slice(0, 4)))
+    if (abierto) {
+      setAnioVisible(Number(valor.slice(0, 4)))
+      setVista('meses')
+    }
   }, [abierto, valor])
 
   useEffect(() => {
@@ -111,43 +117,76 @@ export function SelectorMes({ etiqueta, valor, onChange, min, max }: Props) {
             <FlechaAnio
               direccion="atras"
               onClick={() => setAnioVisible((a) => a - 1)}
-              deshabilitado={anioVisible <= anioMin}
+              deshabilitado={vista === 'anios' || anioVisible <= anioMin}
             />
-            <span className="font-mono text-sm font-medium tabular-nums">
-              {anioVisible}
-            </span>
+
+            {/* El año abre la grilla de años, para no tener que ir de a uno. */}
+            <button
+              type="button"
+              onClick={() => setVista((v) => (v === 'meses' ? 'anios' : 'meses'))}
+              aria-expanded={vista === 'anios'}
+              className="rounded-md px-3 py-1 font-mono text-sm font-medium tabular-nums transition-colors hover:bg-marca-suave"
+            >
+              {vista === 'anios' ? 'Elegir año' : anioVisible}
+            </button>
+
             <FlechaAnio
               direccion="adelante"
               onClick={() => setAnioVisible((a) => a + 1)}
-              deshabilitado={anioVisible >= anioMax}
+              deshabilitado={vista === 'anios' || anioVisible >= anioMax}
             />
           </div>
 
-          <div className="grid grid-cols-4 gap-1">
-            {MESES_CORTOS.map((mes, i) => {
-              const inhabilitado = deshabilitado(i)
-              const elegido = anioVisible === anioSeleccionado && i === mesSeleccionado
-
-              return (
-                <button
-                  key={mes}
-                  type="button"
-                  disabled={inhabilitado}
-                  aria-current={elegido ? 'true' : undefined}
-                  onClick={() => elegir(i)}
-                  className={`rounded-md px-2 py-2.5 text-sm transition-colors ${
-                    elegido
-                      ? 'bg-marca font-medium text-white'
-                      : inhabilitado
-                        ? 'cursor-not-allowed text-tenue/35'
+          {vista === 'anios' ? (
+            <div className="grid max-h-56 grid-cols-4 gap-1 overflow-y-auto">
+              {Array.from({ length: anioMax - anioMin + 1 }, (_, i) => anioMin + i).map(
+                (anio) => (
+                  <button
+                    key={anio}
+                    type="button"
+                    aria-current={anio === anioVisible ? 'true' : undefined}
+                    onClick={() => {
+                      setAnioVisible(anio)
+                      setVista('meses')
+                    }}
+                    className={`rounded-md px-2 py-2.5 font-mono text-sm tabular-nums transition-colors ${
+                      anio === anioVisible
+                        ? 'bg-marca font-medium text-white'
                         : 'text-tinta hover:bg-marca-suave'
-                  }`}
-                >
-                  {mes}
-                </button>
-              )
-            })}
-          </div>
+                    }`}
+                  >
+                    {anio}
+                  </button>
+                ),
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-4 gap-1">
+              {MESES_CORTOS.map((mes, i) => {
+                const inhabilitado = deshabilitado(i)
+                const elegido = anioVisible === anioSeleccionado && i === mesSeleccionado
+
+                return (
+                  <button
+                    key={mes}
+                    type="button"
+                    disabled={inhabilitado}
+                    aria-current={elegido ? 'true' : undefined}
+                    onClick={() => elegir(i)}
+                    className={`rounded-md px-2 py-2.5 text-sm transition-colors ${
+                      elegido
+                        ? 'bg-marca font-medium text-white'
+                        : inhabilitado
+                          ? 'cursor-not-allowed text-tenue/35'
+                          : 'text-tinta hover:bg-marca-suave'
+                    }`}
+                  >
+                    {mes}
+                  </button>
+                )
+              })}
+            </div>
+          )}
         </div>
       )}
     </div>

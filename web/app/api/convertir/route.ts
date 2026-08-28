@@ -108,6 +108,12 @@ export async function GET(request: Request) {
           desde: await medirEnVaras(monto, desde),
           hasta: await medirEnVaras(monto, hasta),
         },
+        // Cuanto costaba una unidad de cada vara, en pesos. Es lo que explica
+        // la tabla: si la UF subio, el mismo monto compra menos UF.
+        unidades: {
+          desde: await preciosUnidad(desde),
+          hasta: await preciosUnidad(hasta),
+        },
       },
       { headers: { 'Cache-Control': 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400' } },
     )
@@ -162,6 +168,18 @@ async function contrastarConIpc(
       3,
     ),
   }
+}
+
+/** Cuanto cuesta una unidad de cada vara, en pesos, en ese mes. */
+async function preciosUnidad(mes: string) {
+  const valores = await Promise.all(VARAS.map((vara) => valorMensual(vara, mes)))
+
+  const salida: Partial<Record<Vara, number | null>> = {}
+  VARAS.forEach((vara, i) => {
+    salida[vara] = valores[i]
+  })
+
+  return salida
 }
 
 /** El monto expresado en cada vara de medida. */

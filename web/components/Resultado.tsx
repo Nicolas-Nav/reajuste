@@ -43,11 +43,11 @@ export function Resultado({
             </span>
           </p>
 
-          <TablaVaras consulta={consulta} varas={varas} />
+          <TablaVaras consulta={consulta} varas={varas} unidades={datos.unidades} />
         </div>
 
         <div className="lg:pt-1">
-          <Grafico puntos={grafico} etiqueta="Valor de la UF en el periodo" />
+          <Grafico puntos={grafico} etiqueta="Cuanto cuesta una UF, en pesos" />
         </div>
       </div>
 
@@ -65,9 +65,11 @@ export function Resultado({
 function TablaVaras({
   consulta,
   varas,
+  unidades,
 }: {
   consulta: RespuestaConversion['consulta']
   varas: RespuestaConversion['varas']
+  unidades: RespuestaConversion['unidades']
 }) {
   const filas = (['uf', 'utm', 'dolar'] as const).filter(
     (vara) => varas.desde[vara] != null && varas.hasta[vara] != null,
@@ -110,9 +112,16 @@ function TablaVaras({
             const cambio = (ahora / antes - 1) * 100
 
             return (
-              <tr key={vara} className="border-b border-linea/60">
+              <tr key={vara} className="border-b border-linea/60 align-top">
                 <th scope="row" className="py-3 text-left font-normal text-tinta">
                   {NOMBRE_VARA[vara]}
+                  {/* Cuanto costaba una unidad. Es lo que explica la tabla: si
+                      la vara sube, el mismo monto compra menos. */}
+                  {unidades.desde[vara] != null && unidades.hasta[vara] != null && (
+                    <span className="mt-0.5 block font-mono text-[11px] text-tenue">
+                      {pesos(unidades.desde[vara]!)} a {pesos(unidades.hasta[vara]!)}
+                    </span>
+                  )}
                 </th>
                 <td className="py-3 text-right font-mono tabular-nums text-tenue">
                   {numero(antes)}
