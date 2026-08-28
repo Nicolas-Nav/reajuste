@@ -166,15 +166,29 @@ Se resolvio con `minmax(0, ...)`.
 
 ---
 
-## Fase 6. Cierre `[N]` (medio dia)
+## Fase 6. Cierre
 
-* [ ] README: que es, capturas, como correrlo, y por que las decisiones tecnicas
-  * [ ] Explicar el encadenamiento del IPC, que es lo que te diferencia
-  * [ ] Explicar la idempotencia de la ingesta
-* [ ] Deploy a Vercel
-* [ ] Descripcion y topics en el repo de GitHub
-* [ ] Agregar el proyecto a `profile.ts` del portafolio
-* [ ] Revisar que el CI este verde
+* [x] `[C]` README con las decisiones tecnicas, la API y la estructura
+* [x] `[C]` Descripcion y topics en el repo de GitHub
+* [x] `[C]` Agregar el proyecto a `profile.ts` del portafolio
+* [x] `[C]` CI verde
+* [ ] `[N]` Sacar una captura de la app y guardarla en `docs/pantalla.png`,
+      despues descomentar la linea de la imagen en el README
+* [ ] `[N]` Deploy a Vercel, ver mas abajo
+* [ ] `[N]` Con la URL en vivo: agregarla al README y al `profile.ts` del
+      portafolio, en el campo `link`
+
+### Como desplegar en Vercel
+
+1. Entrar a [vercel.com/new](https://vercel.com/new) e importar el repo
+   `Nicolas-Nav/reajuste`
+2. **Root Directory: `web`.** Es lo unico que hay que cambiar a mano; sin eso
+   Vercel busca el `package.json` en la raiz y no lo encuentra
+3. En Environment Variables agregar `DATABASE_URL` con el connection string de
+   Neon, el mismo del `.env`
+4. Deploy
+
+Vercel detecta Next.js solo y de ahi en adelante despliega en cada push a `main`.
 
 ---
 
