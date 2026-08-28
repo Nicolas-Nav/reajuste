@@ -8,8 +8,9 @@
  * encadenado como contraste. Que ambos coincidan es la senal de que el numero
  * esta bien; si se separan mucho, algo esta mal en los datos.
  *
- * Ademas expresa el monto en UF, UTM y dolares en ambas fechas, porque segun la
- * vara con que se mida la respuesta cambia, y esa comparacion es lo interesante.
+ * Ademas expresa el monto nominal, sin reajustar, en UF, UTM y dolares en ambas
+ * fechas. Esa comparacion hace tangible la erosion: los mismos pesos guardados
+ * compran cada vez menos de cada unidad.
  */
 
 import { NextResponse } from 'next/server'
@@ -99,12 +100,16 @@ export async function GET(request: Request) {
           deflactor: 'uf',
         },
         contraste: await contrastarConIpc(monto, desde, hasta, equivalente),
+        // El MISMO monto nominal en ambas fechas, no el reajustado. Medir el
+        // monto ya convertido daria una fila de UF identica por construccion,
+        // porque la UF es el deflactor que se acaba de usar; sin reajustar, en
+        // cambio, se ve cuanto poder de compra se perdio en cada unidad.
         varas: {
           desde: await medirEnVaras(monto, desde),
-          hasta: await medirEnVaras(equivalente, hasta),
+          hasta: await medirEnVaras(monto, hasta),
         },
       },
-      { headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' } },
+      { headers: { 'Cache-Control': 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400' } },
     )
   } catch (error) {
     if (error instanceof MesInvalido) {

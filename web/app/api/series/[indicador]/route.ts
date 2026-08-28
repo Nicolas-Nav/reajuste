@@ -66,7 +66,7 @@ export async function GET(
       },
       {
         // Los datos cambian una vez al dia, asi que vale la pena cachear.
-        headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' },
+        headers: { 'Cache-Control': 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400' },
       },
     )
   } catch (error) {

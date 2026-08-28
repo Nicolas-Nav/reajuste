@@ -57,11 +57,10 @@ export function Resultado({
 }
 
 /**
- * El mismo monto medido con distintas varas.
+ * El monto nominal, sin reajustar, medido con otras varas en ambas fechas.
  *
- * En UF la cifra es identica en ambas fechas, porque la UF es justamente el
- * deflactor que se uso. Lo interesante es la comparacion con las otras: contra
- * el dolar o la UTM la respuesta cambia.
+ * Muestra la erosion de forma tangible: los mismos pesos guardados bajo el
+ * colchon compran cada vez menos UF, menos UTM y menos dolares.
  */
 function TablaVaras({
   consulta,
@@ -78,9 +77,15 @@ function TablaVaras({
 
   return (
     <div className="mt-10 overflow-x-auto">
-      <table className="w-full min-w-[380px] border-collapse text-sm">
-        <caption className="mb-3 text-left text-sm text-tenue">
-          El mismo monto, medido con otras varas
+      <table className="w-full min-w-[420px] border-collapse text-sm">
+        <caption className="mb-4 text-left text-sm text-tenue">
+          <strong className="block font-medium text-tinta">
+            Y si esos {pesos(consulta.monto)} hubieran quedado guardados
+          </strong>
+          <span className="mt-1 block">
+            Arriba calculamos cuanto necesitas hoy para igualar. Aca es al reves: los
+            mismos pesos, sin reajustar, comprando cada vez menos de cada unidad.
+          </span>
         </caption>
         <thead>
           <tr className="border-b border-linea text-left text-tenue">
@@ -93,24 +98,51 @@ function TablaVaras({
             <th scope="col" className="pb-2 text-right font-medium">
               {mesLargo(consulta.hasta)}
             </th>
+            <th scope="col" className="pb-2 text-right font-medium">
+              Cambio
+            </th>
           </tr>
         </thead>
         <tbody>
-          {filas.map((vara) => (
-            <tr key={vara} className="border-b border-linea/60">
-              <th scope="row" className="py-3 text-left font-normal text-tinta">
-                {NOMBRE_VARA[vara]}
-              </th>
-              <td className="py-3 text-right font-mono tabular-nums text-tenue">
-                {numero(varas.desde[vara]!)}
-              </td>
-              <td className="py-3 text-right font-mono tabular-nums text-tinta">
-                {numero(varas.hasta[vara]!)}
-              </td>
-            </tr>
-          ))}
+          {filas.map((vara) => {
+            const antes = varas.desde[vara]!
+            const ahora = varas.hasta[vara]!
+            const cambio = (ahora / antes - 1) * 100
+
+            return (
+              <tr key={vara} className="border-b border-linea/60">
+                <th scope="row" className="py-3 text-left font-normal text-tinta">
+                  {NOMBRE_VARA[vara]}
+                </th>
+                <td className="py-3 text-right font-mono tabular-nums text-tenue">
+                  {numero(antes)}
+                </td>
+                <td className="py-3 text-right font-mono tabular-nums text-tinta">
+                  {numero(ahora)}
+                </td>
+                <td
+                  className={`py-3 text-right font-mono tabular-nums ${
+                    cambio < 0 ? 'text-alerta' : 'text-marca'
+                  }`}
+                >
+                  {cambio > 0 ? '+' : ''}
+                  {porcentaje(cambio)}
+                </td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
+
+      {/*
+        Aclaracion util cuando alguien contrasta con otra calculadora: los sitios
+        de UF suelen mostrar el valor de un dia puntual, y la UF se mueve todos
+        los dias. Sin esta nota, una diferencia de decimas se lee como un error.
+      */}
+      <p className="mt-3 text-xs text-tenue">
+        Valores al ultimo dia de cada mes. La UF cambia a diario, asi que otra
+        calculadora que use un dia distinto puede dar decimas de diferencia.
+      </p>
     </div>
   )
 }
