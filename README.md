@@ -14,9 +14,7 @@ poder de compra perdido: 39,9%
 **Python + pandas + PostgreSQL + Next.js.** Datos de
 [mindicador.cl](https://mindicador.cl), sin API key.
 
-<!-- Captura: guarda una imagen en docs/pantalla.png y descomenta esta linea
-![Reajuste](docs/pantalla.png)
--->
+![La calculadora, con el resultado y el grafico de la UF](docs/pantalla.png)
 
 ---
 
@@ -73,6 +71,19 @@ hipotecarios estan en UF.
 Calcular por ambos caminos da el mismo resultado con **0,097% de diferencia**.
 Como son fuentes independientes, ese contraste valida el encadenamiento del IPC,
 y por eso la app muestra los dos numeros en vez de esconder uno.
+
+### La tabla muestra la erosion, no el resultado otra vez
+
+![El resultado con la tabla de unidades](docs/resultado.png)
+
+El titular responde cuanto necesitas hoy para igualar, y la cifra sube. La tabla
+va al reves: los mismos pesos sin reajustar, comprando cada vez menos de cada
+unidad. Debajo de cada nombre va lo que costaba esa unidad, que es lo que
+explica la caida.
+
+Medir ahi el monto ya reajustado seria inutil: la fila de UF saldria identica en
+ambas fechas por construccion, porque la UF es el deflactor que se acaba de
+usar.
 
 ### El encadenamiento vive en un solo lugar
 
