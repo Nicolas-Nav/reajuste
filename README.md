@@ -9,6 +9,8 @@ equivalen a $1.331.548 en agosto de 2026
 poder de compra perdido: 39,9%
 ```
 
+**[Probarlo en vivo](https://reajuste-beige.vercel.app)**
+
 **Python + pandas + PostgreSQL + Next.js.** Datos de
 [mindicador.cl](https://mindicador.cl), sin API key.
 
@@ -151,7 +153,7 @@ Codigos de error: `400` parametros invalidos, `404` indicador inexistente,
 `422` fecha fuera del rango disponible, `503` base sin configurar.
 
 ```bash
-curl "http://localhost:3000/api/convertir?monto=800000&desde=2015-01"
+curl "https://reajuste-beige.vercel.app/api/convertir?monto=800000&desde=2015-01"
 ```
 
 ---
