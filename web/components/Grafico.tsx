@@ -1,15 +1,20 @@
 'use client'
 
-import { useId } from 'react'
-import { mesCorto, entero } from '@/lib/formato'
+import { useId, useRef, useState } from 'react'
+import { entero, mesCorto } from '@/lib/formato'
 
 export type PuntoGrafico = { fecha: string; valor: number }
+
+const ANCHO = 720
+const ALTO = 220
+const MARGEN = { arriba: 16, abajo: 28, izq: 8, der: 8 }
 
 /**
  * Grafico de area de la serie, en SVG puro.
  *
- * Sin libreria de graficos a proposito: son cuatro operaciones de escala y una
- * ruta, y una dependencia de 50 kB para esto no se justifica.
+ * Sin libreria de graficos a proposito: son cuatro operaciones de escala, una
+ * ruta y la busqueda del punto mas cercano al cursor. Una dependencia de 50 kB
+ * para esto no se justifica.
  */
 export function Grafico({
   puntos,
@@ -19,12 +24,10 @@ export function Grafico({
   etiqueta: string
 }) {
   const id = useId()
+  const svg = useRef<SVGSVGElement>(null)
+  const [activo, setActivo] = useState<number | null>(null)
 
   if (puntos.length < 2) return null
-
-  const ANCHO = 720
-  const ALTO = 220
-  const MARGEN = { arriba: 16, abajo: 28, izq: 8, der: 8 }
 
   const valores = puntos.map((p) => p.valor)
   const min = Math.min(...valores)
@@ -42,23 +45,50 @@ export function Grafico({
 
   const primero = puntos[0]
   const ultimo = puntos[puntos.length - 1]
+  const destacado = activo === null ? null : puntos[activo]
+
+  /**
+   * Indice del punto mas cercano al cursor.
+   *
+   * Hay que pasar de pixeles de pantalla a coordenadas del viewBox, porque el
+   * SVG se escala con el ancho disponible y los dos sistemas no coinciden.
+   */
+  function alMover(evento: React.PointerEvent<SVGSVGElement>) {
+    const caja = svg.current?.getBoundingClientRect()
+    if (!caja) return
+
+    const relativo = ((evento.clientX - caja.left) / caja.width) * ANCHO
+    const proporcion = (relativo - MARGEN.izq) / anchoUtil
+    const indice = Math.round(proporcion * (puntos.length - 1))
+
+    setActivo(Math.min(puntos.length - 1, Math.max(0, indice)))
+  }
 
   return (
     <figure className="mt-10">
       {/*
         Sin repetir cifras a proposito. El grafico dibuja la serie diaria y la
         tabla usa valores de fin de mes, asi que los extremos no coinciden al
-        peso; mostrarlos en los dos lados se lee como una contradiccion. Aca va
-        la forma, en la tabla van los numeros.
+        peso; mostrarlos en los dos lados se lee como una contradiccion.
       */}
-      <figcaption className="mb-3 text-sm font-medium text-tinta">{etiqueta}</figcaption>
+      <figcaption className="mb-1 text-sm font-medium text-tinta">{etiqueta}</figcaption>
+
+      {/* Altura fija para que el grafico no salte cuando aparece la lectura. */}
+      <p className="mb-2 h-5 font-mono text-xs text-tenue" aria-live="polite">
+        {destacado
+          ? `${mesCorto(destacado.fecha.slice(0, 7))}: $${entero(destacado.valor)}`
+          : 'Pasa el cursor para ver el valor de cada dia'}
+      </p>
 
       <div className="overflow-x-auto">
         <svg
+          ref={svg}
           viewBox={`0 0 ${ANCHO} ${ALTO}`}
-          className="h-auto w-full min-w-[320px]"
+          className="h-auto w-full min-w-[320px] touch-pan-y"
           role="img"
-          aria-label={`${etiqueta}, de ${entero(primero.valor)} en ${mesCorto(primero.fecha.slice(0, 7))} a ${entero(ultimo.valor)} en ${mesCorto(ultimo.fecha.slice(0, 7))}`}
+          aria-label={`${etiqueta}. De $${entero(primero.valor)} en ${mesCorto(primero.fecha.slice(0, 7))} a $${entero(ultimo.valor)} en ${mesCorto(ultimo.fecha.slice(0, 7))}.`}
+          onPointerMove={alMover}
+          onPointerLeave={() => setActivo(null)}
         >
           <defs>
             <linearGradient id={`relleno-${id}`} x1="0" y1="0" x2="0" y2="1">
@@ -83,7 +113,32 @@ export function Grafico({
             }}
           />
 
-          <circle cx={x(puntos.length - 1)} cy={y(ultimo.valor)} r="4" fill="var(--color-marca)" />
+          {destacado && activo !== null && (
+            <g>
+              <line
+                x1={x(activo)}
+                y1={MARGEN.arriba}
+                x2={x(activo)}
+                y2={MARGEN.arriba + altoUtil}
+                stroke="var(--color-tenue)"
+                strokeWidth="1"
+                strokeDasharray="3 3"
+              />
+              <circle
+                cx={x(activo)}
+                cy={y(destacado.valor)}
+                r="4.5"
+                fill="var(--color-marca)"
+                stroke="var(--color-papel)"
+                strokeWidth="2"
+              />
+            </g>
+          )}
+
+          {/* El punto final solo cuando no hay lectura activa, para no duplicar. */}
+          {!destacado && (
+            <circle cx={x(puntos.length - 1)} cy={y(ultimo.valor)} r="4" fill="var(--color-marca)" />
+          )}
 
           <text x={x(0)} y={ALTO - 8} className="fill-tenue text-[11px]" textAnchor="start">
             {mesCorto(primero.fecha.slice(0, 7))}
